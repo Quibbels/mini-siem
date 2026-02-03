@@ -1,0 +1,7 @@
+timestamp,src_ip,dst_ip,src_port,dst_port,user,event_type,severity,message
+2026-02-01T10:00:00Z,10.0.0.5,10.0.0.10,34567,22,alice,login_failure,2,Failed SSH login
+2026-02-01T10:01:00Z,10.0.0.5,10.0.0.10,34567,22,alice,login_failure,2,Failed SSH login
+2026-02-01T10:02:00Z,10.0.0.5,10.0.0.10,34567,22,alice,login_failure,2,Failed SSH login
+2026-02-01T10:03:00Z,10.0.0.5,10.0.0.10,34567,22,alice,login_failure,2,Failed SSH login
+2026-02-01T10:04:00Z,10.0.0.5,10.0.0.10,34567,22,alice,login_failure,2,Failed SSH login
+2026-02-01T11:00:00Z,192.168.1.10,10.0.0.10,40000,1,,firewall_deny,3,Blocked packet
