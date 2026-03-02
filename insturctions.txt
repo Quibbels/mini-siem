@@ -1,0 +1,8 @@
+How to run program
+    open terminal and type
+        cd backend
+        python app.py
+    Open another terminal and type
+        cd frontend
+        npm run dev
+
