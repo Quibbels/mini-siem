@@ -13,7 +13,11 @@ app = Flask(__name__)
 CORS(app)
 
 init_db()
-
+db = SessionLocal()
+db.query(Event).delete()
+db.query(Alert).delete()
+db.commit()
+db.close()
 
 @app.route("/api/ingest", methods=["POST"])
 def api_ingest():
