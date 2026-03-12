@@ -63,9 +63,9 @@ const App = () => {
           }}
         >
           <div>
-            <h1 style={{ margin: 0, fontSize: 24 }}>Mini SIEM Dashboard</h1>
+            <h1 style={{ margin: 0, fontSize: 24 }}>Spoofed</h1>
             <p style={{ margin: 0, marginTop: 4, color: "#9ca3af", fontSize: 14 }}>
-              Normalized security events, simple correlation rules, and a minimalist view.
+              Security SIEM
             </p>
           </div>
           <button
@@ -131,21 +131,46 @@ const App = () => {
         </section>
 
         <section
-          style={{
-            backgroundColor: "#020617",
-            borderRadius: 16,
-            padding: 16,
-            border: "1px solid #111827"
-          }}
-        >
-          <div
-            style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}
-          >
-            <h2 style={{ margin: 0, fontSize: 16 }}>Active alerts</h2>
-            <span style={{ fontSize: 12, color: "#6b7280" }}>Top 50 by severity</span>
-          </div>
-          <AlertsTable alerts={alerts} />
-        </section>
+  style={{
+    backgroundColor: "#020617",
+    borderRadius: 16,
+    padding: 16,
+    border: "1px solid #111827"
+  }}
+>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 8
+    }}
+  >
+    <div>
+      <h2 style={{ margin: 0, fontSize: 16 }}>Active alerts</h2>
+      <span style={{ fontSize: 12, color: "#6b7280" }}>Top 50 by severity</span>
+    </div>
+    <button
+      onClick={async () => {
+        await fetch("/api/alerts/clear", { method: "POST" });
+        await loadData(); // reuse your existing function to refresh overview/alerts
+      }}
+      style={{
+        padding: "6px 12px",
+        borderRadius: 999,
+        border: "1px solid #111827",
+        backgroundColor: "#020617",
+        color: "#e5e7eb",
+        fontSize: 12,
+        cursor: "pointer"
+      }}
+    >
+      Clear alerts
+    </button>
+  </div>
+  <AlertsTable alerts={alerts} />
+</section>
+
       </main>
     </div>
   );

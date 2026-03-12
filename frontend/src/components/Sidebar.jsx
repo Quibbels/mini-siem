@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 
 const Sidebar = ({ securityMeasures, onIngest }) => {
   const blocked =
@@ -7,6 +7,26 @@ const Sidebar = ({ securityMeasures, onIngest }) => {
       : [];
   const rules =
     securityMeasures && securityMeasures.rules ? securityMeasures.rules : [];
+
+  const fileInputRef = useRef(null);
+
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    await fetch("/api/upload-logs", {
+      method: "POST",
+      body: formData
+    });
+
+    // After upload+ingest, refresh dashboard data
+    if (typeof onIngest === "function") {
+      await onIngest();
+    }
+  };
 
   return (
     <aside
@@ -85,7 +105,9 @@ const Sidebar = ({ securityMeasures, onIngest }) => {
           Detection rules
         </h3>
         {rules.length === 0 ? (
-          <p style={{ margin: 0, fontSize: 13, color: "#6b7280" }}>No alerts yet.</p>
+          <p style={{ margin: 0, fontSize: 13, color: "#6b7280" }}>
+            No alerts yet.
+          </p>
         ) : (
           <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {rules.map((r) => (
@@ -113,6 +135,7 @@ const Sidebar = ({ securityMeasures, onIngest }) => {
           Architecture: CSV log sources → ingestion script → SQLite SIEM core →
           rules → dashboard.
         </p>
+
         <button
           onClick={onIngest}
           style={{
@@ -123,11 +146,32 @@ const Sidebar = ({ securityMeasures, onIngest }) => {
             border: "1px solid #111827",
             color: "#e5e7eb",
             fontSize: 11,
-            cursor: "pointer"
+            cursor: "pointer",
+            marginBottom: 8
           }}
         >
-          Re-ingest logs
+          Re-ingest sample logs
         </button>
+
+        <div style={{ marginTop: 8 }}>
+          <p
+            style={{
+              margin: 0,
+              marginBottom: 4,
+              fontSize: 11,
+              color: "#6b7280"
+            }}
+          >
+            Upload CSV logs and analyze them:
+          </p>
+          <input
+            type="file"
+            accept=".csv"
+            ref={fileInputRef}
+            onChange={handleUpload}
+            style={{ fontSize: 11, color: "#e5e7eb" }}
+          />
+        </div>
       </div>
     </aside>
   );

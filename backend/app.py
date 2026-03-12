@@ -9,6 +9,17 @@ from rules import apply_rules
 
 from datetime import datetime, timedelta
 
+from flask import Flask, jsonify, request
+from werkzeug.utils import secure_filename
+import os
+
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app = Flask(__name__)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+
 app = Flask(__name__)
 CORS(app)
 
@@ -18,6 +29,40 @@ db.query(Event).delete()
 db.query(Alert).delete()
 db.commit()
 db.close()
+
+@app.route("/api/upload-logs", methods=["POST"])
+def api_upload_logs():
+    if "file" not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    f = request.files["file"]
+    if f.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    filename = secure_filename(f.filename)
+    save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    f.save(save_path)
+
+    # Ingest the saved CSV using your existing logic
+    db = SessionLocal()
+    try:
+        count = ingest_csv(db, save_path)
+
+        # Recompute alerts after ingest
+        db.query(Alert).delete()
+        events = db.query(Event).order_by(Event.timestamp).all()
+        alerts_dicts = apply_rules(events)
+        for a in alerts_dicts:
+            db.add(Alert(**a))
+        db.commit()
+
+        return jsonify({"ingested": count, "filename": filename}), 200
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
 
 @app.route("/api/ingest", methods=["POST"])
 def api_ingest():
@@ -180,6 +225,16 @@ def api_security_measures():
         ]
 
         return jsonify({"blocked_ips": blocked_ips, "rules": rules_summary})
+    finally:
+        db.close()
+
+@app.route("/api/alerts/clear", methods=["POST"])
+def api_clear_alerts():
+    db = SessionLocal()
+    try:
+        deleted = db.query(Alert).delete()
+        db.commit()
+        return jsonify({"deleted": deleted}), 200
     finally:
         db.close()
 
