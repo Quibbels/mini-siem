@@ -11,17 +11,20 @@ const App = () => {
   const [topSources, setTopSources] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [securityMeasures, setSecurityMeasures] = useState(null);
+  const [filters, setFilters] = useState({ severity: '', sourceIp: '' });
 
   const loadData = async () => {
     const [ov, ts, tsrc, al, sm] = await Promise.all([
       fetch("/api/overview").then((r) => r.json()),
       fetch("/api/events/time-series").then((r) => r.json()),
+      
       fetch("/api/events/top-sources").then((r) => r.json()),
       fetch("/api/alerts").then((r) => r.json()),
       fetch("/api/security-measures").then((r) => r.json())
     ]);
     setOverview(ov);
     setTimeSeries(ts);
+    console.log('TimeSeries data:', ts);  // Check browser console
     setTopSources(tsrc);
     setAlerts(al);
     setSecurityMeasures(sm);
@@ -52,7 +55,17 @@ const App = () => {
         fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
       }}
     >
-      <Sidebar securityMeasures={securityMeasures} onIngest={handleIngest} />
+      <Sidebar 
+  securityMeasures={securityMeasures} 
+  onIngest={handleIngest}
+  onRefresh={loadData}
+  onClearAlerts={async () => {
+    await fetch("/api/alerts/clear", { method: "POST" });
+    await loadData();
+  }}
+  filters={filters}
+  onFiltersChange={setFilters}
+/>
       <main style={{ flex: 1, padding: "24px 32px" }}>
         <header
           style={{
@@ -168,7 +181,11 @@ const App = () => {
       Clear alerts
     </button>
   </div>
-  <AlertsTable alerts={alerts} />
+  <AlertsTable 
+  alerts={alerts}
+  filters={filters}
+  onFiltersChange={setFilters}
+/>
 </section>
 
       </main>
