@@ -111,8 +111,9 @@ const Sidebar = ({
             }}
           >
             <option value="">All severity</option>
-            <option value="4">High (4+)</option>
-            <option value="3">Medium (3+)</option>
+            <option value="3">High (3+)</option>
+            <option value="2">Medium (2+)</option>
+            <option value="1">Low (1+)</option>
           </select>
           <input
             placeholder="Filter IP..."

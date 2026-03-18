@@ -1,9 +1,9 @@
 import React from 'react';
 
 const severityColor = (s) => {
-  if (s >= 5) return '#ef4444';
-  if (s >= 4) return '#f97316';
-  if (s >= 3) return '#eab308';
+  if (s >= 3) return '#ef4444';
+  if (s >= 2) return '#f97316';
+  if (s >= 1) return '#eab308';
   return '#6b7280';
 };
 
@@ -52,8 +52,8 @@ const AlertsTable = ({ alerts, filters = {}, onFiltersChange }) => {
     >
       <option value="">All</option>
       <option value="1">1+</option>
+      <option value="2">2+</option>
       <option value="3">3+</option>
-      <option value="4">4+</option>
     </select>
   </div>
   <input
