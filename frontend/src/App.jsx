@@ -45,6 +45,24 @@ const App = () => {
     await loadData();
   };
 
+  const handleDeleteAlert = async (alertId) => {
+  const ok = window.confirm("Delete this alert?");
+  if (!ok) return;
+
+  const res = await fetch(`/api/alerts/${alertId}`, {
+    method: "DELETE",
+  });
+
+  if (res.ok) {
+    await loadData();
+  } else {
+    const data = await res.json().catch(() => ({}));
+    alert(data.error || "Failed to delete alert");
+  }
+};
+
+console.log("App handleDeleteAlert:", handleDeleteAlert);
+
   return (
     <div
       style={{
@@ -185,6 +203,7 @@ const App = () => {
   alerts={alerts}
   filters={filters}
   onFiltersChange={setFilters}
+  onDeleteAlert={handleDeleteAlert}
 />
 </section>
 

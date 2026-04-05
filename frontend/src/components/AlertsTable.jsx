@@ -1,19 +1,18 @@
-import React from 'react';
+import React from "react";
 
 const severityColor = (s) => {
-  if (s >= 3) return '#ef4444';
-  if (s >= 2) return '#f97316';
-  if (s >= 1) return '#eab308';
-  return '#6b7280';
+  if (s >= 5) return "#ef4444";
+  if (s >= 4) return "#f97316";
+  if (s >= 3) return "#eab308";
+  return "#6b7280";
 };
 
-const AlertsTable = ({ alerts, filters = {}, onFiltersChange }) => {
-  // Client-side filter on existing alerts array
+const AlertsTable = ({ alerts, filters, onFiltersChange, onDeleteAlert }) => {
   const filteredAlerts = alerts.filter((alert) =>
-  (!filters.severity || alert.severity >= parseInt(filters.severity)) &&
-  (!filters.sourceIp || alert.source_ip?.toLowerCase().includes(filters.sourceIp.toLowerCase()))
-);
-
+    (!filters.severity || alert.severity >= parseInt(filters.severity)) &&
+    (!filters.sourceIp ||
+      alert.source_ip?.toLowerCase().includes(filters.sourceIp.toLowerCase()))
+  );
 
   const updateFilter = (key, value) => {
     onFiltersChange({ ...filters, [key]: value });
@@ -21,7 +20,7 @@ const AlertsTable = ({ alerts, filters = {}, onFiltersChange }) => {
 
   if (!alerts || alerts.length === 0) {
     return (
-      <div style={{ fontSize: 13, color: '#6b7280', padding: '32px', textAlign: 'center' }}>
+      <div style={{ fontSize: 13, color: "#6b7280", padding: "32px", textAlign: "center" }}>
         No alerts
       </div>
     );
@@ -29,104 +28,148 @@ const AlertsTable = ({ alerts, filters = {}, onFiltersChange }) => {
 
   return (
     <div>
-      {/* Filters Row - matches your dark theme */}
-      <div style={{
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr auto',
-  gap: 12,
-  marginBottom: 16,
-  padding: '12px 0',
-  borderBottom: '1px solid #111827'
-}}>
-  <div>
-    <label style={{ display: 'block', fontSize: 12, color: '#9ca3af', marginBottom: 4 }}>
-      Min Severity
-    </label>
-    <select
-      value={filters.severity || ''}
-      onChange={(e) => updateFilter('severity', e.target.value)}
-      style={{
-        width: '100%', padding: '6px 8px', background: '#020617',
-        border: '1px solid #374151', borderRadius: 6, color: '#f9fafb', fontSize: 13
-      }}
-    >
-      <option value="">All</option>
-      <option value="1">1+</option>
-      <option value="2">2+</option>
-      <option value="3">3+</option>
-    </select>
-  </div>
-  <input
-    placeholder="Source IP"
-    value={filters.sourceIp || ''}
-    onChange={(e) => updateFilter('sourceIp', e.target.value)}
-    style={{
-      padding: '6px 8px', background: '#020617', border: '1px solid #374151',
-      borderRadius: 6, color: '#f9fafb', fontSize: 13
-    }}
-  />
-  {Object.values(filters).some(v => v) && (
-    <button
-      onClick={() => onFiltersChange({ severity: '', sourceIp: '' })}
-      style={{
-        padding: '6px 12px', background: '#6b7280', border: 'none',
-        borderRadius: 6, color: '#020617', fontSize: 12, cursor: 'pointer'
-      }}
-    >
-      Clear ({filteredAlerts.length})
-    </button>
-  )}
-</div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr auto",
+          gap: 12,
+          marginBottom: 16,
+          padding: "12px 0",
+          borderBottom: "1px solid #111827"
+        }}
+      >
+        <div>
+          <label
+            style={{
+              display: "block",
+              fontSize: 12,
+              color: "#9ca3af",
+              marginBottom: 4
+            }}
+          >
+            Min Severity
+          </label>
+          <select
+            value={filters.severity || ""}
+            onChange={(e) => updateFilter("severity", e.target.value)}
+            style={{
+              width: "100%",
+              padding: "6px 8px",
+              background: "#020617",
+              border: "1px solid #374151",
+              borderRadius: 6,
+              color: "#f9fafb",
+              fontSize: 13
+            }}
+          >
+            <option value="">All</option>
+            <option value="1">1+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+          </select>
+        </div>
 
-      {/* Your Existing Table */}
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+        <input
+          placeholder="Source IP"
+          value={filters.sourceIp || ""}
+          onChange={(e) => updateFilter("sourceIp", e.target.value)}
+          style={{
+            padding: "6px 8px",
+            background: "#020617",
+            border: "1px solid #374151",
+            borderRadius: 6,
+            color: "#f9fafb",
+            fontSize: 13
+          }}
+        />
+
+        {Object.values(filters).some((v) => v) && (
+          <button
+            onClick={() => onFiltersChange({ severity: "", sourceIp: "" })}
+            style={{
+              padding: "6px 12px",
+              background: "#6b7280",
+              border: "none",
+              borderRadius: 6,
+              color: "#020617",
+              fontSize: 12,
+              cursor: "pointer"
+            }}
+          >
+            Clear ({filteredAlerts.length})
+          </button>
+        )}
+      </div>
+
+      <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 12 }}>
+        Showing {filteredAlerts.length} of {alerts.length} alerts
+      </div>
+
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
-            <tr style={{ textAlign: 'left', color: '#9ca3af' }}>
-              <th style={{ padding: '8px 4px', borderBottom: '1px solid #111827' }}>Rule</th>
-              <th style={{ padding: '8px 4px', borderBottom: '1px solid #111827' }}>Severity</th>
-              <th style={{ padding: '8px 4px', borderBottom: '1px solid #111827' }}>Source IP</th>
-              <th style={{ padding: '8px 4px', borderBottom: '1px solid #111827' }}>User</th>
-              <th style={{ padding: '8px 4px', borderBottom: '1px solid #111827' }}>Count</th>
-              <th style={{ padding: '8px 4px', borderBottom: '1px solid #111827' }}>Last seen</th>
+            <tr style={{ textAlign: "left", color: "#9ca3af" }}>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Rule</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Severity</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Source IP</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>User</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Count</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Last seen</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Action</th>
             </tr>
           </thead>
           <tbody>
             {filteredAlerts.map((a) => (
               <tr key={a.id}>
-                <td style={{ padding: '8px 4px', borderBottom: '1px solid #020617' }}>
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
                   {a.rule_name}
                 </td>
-                <td style={{ padding: '8px 4px', borderBottom: '1px solid #020617' }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                     <span
                       style={{
                         width: 8,
                         height: 8,
-                        borderRadius: 999,
+                        borderRadius: "999px",
                         backgroundColor: severityColor(a.severity)
                       }}
                     />
                     <span>{a.severity}</span>
                   </span>
                 </td>
-                <td style={{ padding: '8px 4px', borderBottom: '1px solid #020617' }}>
-                  {a.source_ip || 'Unknown'}
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
+                  {a.source_ip || "Unknown"}
                 </td>
-                <td style={{ padding: '8px 4px', borderBottom: '1px solid #020617' }}>
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
                   {a.username}
                 </td>
-                <td style={{ padding: '8px 4px', borderBottom: '1px solid #020617' }}>
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
                   {a.count}
                 </td>
-                <td style={{ padding: '8px 4px', borderBottom: '1px solid #020617' }}>
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
                   {new Date(a.last_seen).toLocaleString()}
+                </td>
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
+                  <button
+                    onClick={() => onDeleteAlert(a.id)}
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: 999,
+                      border: "1px solid #7f1d1d",
+                      backgroundColor: "#111827",
+                      color: "#fca5a5",
+                      fontSize: 12,
+                      cursor: "pointer"
+                    }}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
             {filteredAlerts.length === 0 && (
               <tr>
-                <td colSpan="6" style={{ padding: 32, textAlign: 'center', color: '#6b7280' }}>
+                <td colSpan="7" style={{ padding: 32, textAlign: "center", color: "#6b7280" }}>
                   No matching alerts
                 </td>
               </tr>

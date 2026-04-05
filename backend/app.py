@@ -18,9 +18,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
-
-app = Flask(__name__)
 CORS(app)
 
 init_db()
@@ -238,6 +235,21 @@ def api_clear_alerts():
     finally:
         db.close()
 
+@app.route("/api/alerts/<int:alert_id>", methods=["DELETE"])
+def api_delete_alert(alert_id):
+    db = SessionLocal()
+    try:
+        alert = db.query(Alert).filter(Alert.id == alert_id).first()
+
+        if not alert:
+            return jsonify({"error": "Alert not found"}), 404
+
+        db.delete(alert)
+        db.commit()
+
+        return jsonify({"deleted": alert_id}), 200
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
