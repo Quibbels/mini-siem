@@ -123,14 +123,13 @@ def api_overview():
 def api_events_time_series():
     db = SessionLocal()
     try:
-        # Last 24h
         now = datetime.utcnow()
         start = now - timedelta(hours=24)
 
         rows = (
             db.query(
                 func.strftime("%Y-%m-%d %H:00:00", Event.timestamp).label("bucket"),
-                func.count(Event.id),
+                func.count(Event.id).label("count"),
             )
             .filter(Event.timestamp >= start)
             .group_by("bucket")
@@ -138,7 +137,25 @@ def api_events_time_series():
             .all()
         )
 
-        data = [{"bucket": r[0], "count": r[1]} for r in rows]
+        # Fallback: if no events in the real last 24h, show the latest 24h window from the DB
+        if not rows:
+            latest_event = db.query(func.max(Event.timestamp)).scalar()
+
+            if latest_event:
+                fallback_start = latest_event - timedelta(hours=24)
+
+                rows = (
+                    db.query(
+                        func.strftime("%Y-%m-%d %H:00:00", Event.timestamp).label("bucket"),
+                        func.count(Event.id).label("count"),
+                    )
+                    .filter(Event.timestamp >= fallback_start)
+                    .group_by("bucket")
+                    .order_by("bucket")
+                    .all()
+                )
+
+        data = [{"bucket": r.bucket, "count": r.count} for r in rows]
         return jsonify(data)
     finally:
         db.close()

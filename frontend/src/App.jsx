@@ -63,6 +63,8 @@ const App = () => {
 
 console.log("App handleDeleteAlert:", handleDeleteAlert);
 
+console.log("TimeSeries data:", timeSeries);
+
   return (
     <div
       style={{
