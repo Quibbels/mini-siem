@@ -198,14 +198,12 @@ def api_alerts():
             data.append(
                 {
                     "id": a.id,
-                    "rule_name": a.rule_name,
-                    "description": a.description,
-                    "severity": a.severity,
+                    "last_seen": a.last_seen.isoformat() if a.last_seen else None,
                     "source_ip": a.source_ip,
-                    "username": a.username,
-                    "first_seen": a.first_seen.isoformat(),
-                    "last_seen": a.last_seen.isoformat(),
-                    "count": a.count,
+                    "dest_ip": a.dest_ip,
+                    "event_type": a.event_type,
+                    "threat_label": a.threat_label,
+                    "severity": a.severity,
                 }
             )
 
@@ -221,24 +219,31 @@ def api_security_measures():
         rows = (
             db.query(Alert.source_ip)
             .filter(Alert.source_ip.isnot(None))
-            .filter(Alert.severity >= 4)
+            .filter(Alert.severity >= 2)
             .group_by(Alert.source_ip)
             .all()
         )
 
         blocked_ips = [r[0] for r in rows]
 
-        rules = (
-            db.query(Alert.rule_name, func.count(Alert.id))
-            .group_by(Alert.rule_name)
+        threat_rows = (
+            db.query(Alert.threat_label, func.count(Alert.id))
+            .group_by(Alert.threat_label)
             .all()
         )
 
         rules_summary = [
-            {"rule_name": r[0], "alerts": r[1]} for r in rules
+            {
+                "rule_name": threat if threat is not None else "unknown",
+                "alerts": count
+            }
+            for threat, count in threat_rows
         ]
 
-        return jsonify({"blocked_ips": blocked_ips, "rules": rules_summary})
+        return jsonify({
+            "blocked_ips": blocked_ips,
+            "rules": rules_summary
+        })
     finally:
         db.close()
 

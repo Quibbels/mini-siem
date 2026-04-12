@@ -25,6 +25,7 @@ const AlertsTable = ({ alerts, filters, onFiltersChange, onDeleteAlert }) => {
       </div>
     );
   }
+console.log("AlertsTable onDeleteAlert:", onDeleteAlert);
 
   return (
     <div>
@@ -109,12 +110,11 @@ const AlertsTable = ({ alerts, filters, onFiltersChange, onDeleteAlert }) => {
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ textAlign: "left", color: "#9ca3af" }}>
-              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Rule</th>
-              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Severity</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Last Seen</th>
               <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Source IP</th>
-              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>User</th>
-              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Count</th>
-              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Last seen</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Destination IP</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Protocol</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Threat Label</th>
               <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Action</th>
             </tr>
           </thead>
