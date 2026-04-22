@@ -1,9 +1,8 @@
 import React from "react";
 
 const severityColor = (s) => {
-  if (s >= 5) return "#ef4444";
-  if (s >= 4) return "#f97316";
-  if (s >= 3) return "#eab308";
+  if (s >= 3) return "#ef4444";
+  if (s >= 2) return "#f97316";
   return "#6b7280";
 };
 
@@ -25,7 +24,6 @@ const AlertsTable = ({ alerts, filters, onFiltersChange, onDeleteAlert }) => {
       </div>
     );
   }
-console.log("AlertsTable onDeleteAlert:", onDeleteAlert);
 
   return (
     <div>
@@ -65,8 +63,8 @@ console.log("AlertsTable onDeleteAlert:", onDeleteAlert);
           >
             <option value="">All</option>
             <option value="1">1+</option>
-            <option value="3">3+</option>
-            <option value="4">4+</option>
+            <option value="2">2+</option>
+            <option value="3">3</option>
           </select>
         </div>
 
@@ -115,6 +113,7 @@ console.log("AlertsTable onDeleteAlert:", onDeleteAlert);
               <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Destination IP</th>
               <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Protocol</th>
               <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Threat Label</th>
+              <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Severity</th>
               <th style={{ padding: "8px 4px", borderBottom: "1px solid #111827" }}>Action</th>
             </tr>
           </thead>
@@ -122,7 +121,19 @@ console.log("AlertsTable onDeleteAlert:", onDeleteAlert);
             {filteredAlerts.map((a) => (
               <tr key={a.id}>
                 <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
-                  {a.rule_name}
+                  {a.last_seen ? new Date(a.last_seen).toLocaleString() : "Unknown"}
+                </td>
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
+                  {a.source_ip || "Unknown"}
+                </td>
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
+                  {a.dest_ip || "Unknown"}
+                </td>
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
+                  {a.protocol || a.event_type || "Unknown"}
+                </td>
+                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
+                  {a.threat_label || "Unknown"}
                 </td>
                 <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
@@ -136,18 +147,6 @@ console.log("AlertsTable onDeleteAlert:", onDeleteAlert);
                     />
                     <span>{a.severity}</span>
                   </span>
-                </td>
-                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
-                  {a.source_ip || "Unknown"}
-                </td>
-                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
-                  {a.username}
-                </td>
-                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
-                  {a.count}
-                </td>
-                <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
-                  {new Date(a.last_seen).toLocaleString()}
                 </td>
                 <td style={{ padding: "8px 4px", borderBottom: "1px solid #020617" }}>
                   <button

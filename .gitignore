@@ -1,1 +1,4 @@
 backend/siem.db
+
+uploads/
+.DS_Store
