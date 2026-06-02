@@ -19,24 +19,19 @@ def normalize_row(row):
                 return row[k]
         return default
 
-    ts_raw = get_any(["Last seen", "timestamp", "time", "date", "@timestamp"])
-    if isinstance(ts_raw, datetime):
-        ts = ts_raw
-    else:
-        ts = dateparser.parse(str(ts_raw)) if ts_raw is not None else datetime.utcnow()
+    last_seen = get_any(["Last seen", "last_seen", "timestamp", "@timestamp"])
+    source_ip = get_any(["Source IP", "source_ip", "src_ip"])
+    dest_ip = get_any(["Destination IP", "dest_ip", "dst_ip"])
+    protocol = get_any(["Protocol", "protocol", "event_type"])
+    threat_label = get_any(["Threat Label", "threat_label", "threatlabel"])
 
-    source_ip = get_any(["Source IP", "src_ip", "source_ip", "client_ip"])
-    dest_ip = get_any(["Destination IP", "dst_ip", "dest_ip", "server_ip"])
-    protocol = get_any(["protocol", "event_type", "action", "event"])
-    threat_label = get_any(["threat_label"], "benign")
-
-    return dict(
-        timestamp=ts,
-        source_ip=str(source_ip) if source_ip else None,
-        dest_ip=str(dest_ip) if dest_ip else None,
-        event_type=str(protocol) if protocol else "unknown",
-        severity=threat_to_severity(threat_label),
-    )
+    return {
+        "timestamp": pd.to_datetime(last_seen),
+        "source_ip": source_ip,
+        "dest_ip": dest_ip,
+        "event_type": protocol,
+        "severity": 3 if str(threat_label).lower() == "malicious" else 2 if str(threat_label).lower() == "suspicious" else 1,
+    }
 
 def ingest_csv(session: Session, csv_path: str):
     df = pd.read_csv(csv_path, encoding="utf-8-sig")
